@@ -26,6 +26,7 @@ score_data['콘센트'] = score_data['자리'].apply(outlet_score)
 score_data['운동장창가'] = score_data['자리'].apply(lambda x: 1.0 if x[1] == '1' else 0.0)
 score_data['에어컨'] = score_data['자리'].apply(lambda x: 1.0 if x in ['C2', 'C3', 'C4', 'D2', 'D3', 'D4'] else 0.0)
 score_data['출입문기피'] = score_data['자리'].apply(lambda x: -1.0 if x in ['A5', 'E5'] else 0.0)
+
 def front_desk_score(x):
     if x in ['A2', 'A3', 'A4']:
         return -1.0
@@ -62,14 +63,23 @@ st.dataframe(sorted_data[['자리', '총점']])
 top3 = sorted_data.head(3)
 st.success(f"🏆 추천 TOP 3 자리는: {', '.join(top3['자리'].tolist())}")
 
-# 자리 시각화
-st.subheader("🧭 자리 배치도 (총점 기준 색상 표시)")
+# 🟩 추천 자리 이모지 시각화
+st.subheader("🟩 추천 자리 시각화")
 
-# 자리 총점을 행렬 형태로 재배치
-seat_matrix = pd.DataFrame(index=rows, columns=cols)
-for _, row in score_data.iterrows():
-    r, c = row['자리'][0], row['자리'][1]
-    seat_matrix.loc[r, c] = round(row['총점'], 1)
+# 추천 TOP 3 자리
+top_seats = set(top3['자리'].tolist())
 
-# 스타일 적용 및 출력
-st.dataframe(seat_matrix.style.background_gradient(cmap='YlOrRd', axis=None))
+# 이모지 자리배치 문자열 생성
+emoji_map = ""
+for r in rows:
+    line = ""
+    for c in cols:
+        pos = r + c
+        if pos in top_seats:
+            line += f"🟩 {pos} "
+        else:
+            line += f"⬜ {pos} "
+    emoji_map += line + "\n\n"
+
+# 출력
+st.markdown(f"```\n{emoji_map}```")

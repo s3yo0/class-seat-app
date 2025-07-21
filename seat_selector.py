@@ -61,3 +61,15 @@ st.dataframe(sorted_data[['자리', '총점']])
 
 top3 = sorted_data.head(3)
 st.success(f"🏆 추천 TOP 3 자리는: {', '.join(top3['자리'].tolist())}")
+
+# 자리 시각화
+st.subheader("🧭 자리 배치도 (총점 기준 색상 표시)")
+
+# 자리 총점을 행렬 형태로 재배치
+seat_matrix = pd.DataFrame(index=rows, columns=cols)
+for _, row in score_data.iterrows():
+    r, c = row['자리'][0], row['자리'][1]
+    seat_matrix.loc[r, c] = round(row['총점'], 1)
+
+# 스타일 적용 및 출력
+st.dataframe(seat_matrix.style.background_gradient(cmap='YlOrRd', axis=None))
